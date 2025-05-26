@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "node-client-webui.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "node-client-webui.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "node-client-webui.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "node-client-webui.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 1001
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: backend
+              containerPort: 23051
+            - name: frontend
+              containerPort: 25080
+          env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "node-client-webui.configmapName" . }}
+                  key: backend_url
+            - name: FRONTEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "node-client-webui.configmapName" . }}
+                  key: frontend_url
+            - name: TLS_OVER_PROXY
+              value: {{ if or .Values.expose.tls.enabled .Values.expose.tlsOverProxy.enabled }}"true"{{ else }}"false"{{ end }}
+            - name: TLS
+              value: {{ if .Values.expose.internalTLS.enabled }}"true"{{ else }}"false"{{ end }}
+            - name: CERT_PATH
+              value: {{ if .Values.expose.internalTLS.enabled }}{{ .Values.expose.internalTLS.tlsPath }}/tls.crt{{ else }}""{{ end }}
+            - name: KEY_PATH
+              value: {{ if .Values.expose.internalTLS.enabled }}{{ .Values.expose.internalTLS.tlsPath }}/tls.key{{ else }}""{{ end }}
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "node-client-webui.secretCredential" . }}
+                  key: username
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "node-client-webui.secretCredential" . }}
+                  key: password
+            - name: DB_PATH
+              value: {{ .Values.dbPath | default "/var/lib/.node-client" }}/node-client.db 
+          volumeMounts:
+            - mountPath: {{ .Values.dbPath | default "/var/lib/.node-client" }
+              name: {{ include "node-client-webui.volumeClaim" . }}
+{{ if .Values.expose.internalTLS.enabled }}          
+            - name: tls-secret-volume
+              mountPath: {{ .Values.expose.internalTLS.tlsPath}}
+              readOnly: true
+{{ end }}
+      volumes:
+        - name: {{ include "node-client-webui.volumeClaim" . }}
+          persistentVolumeClaim:
+            claimName: {{ include "node-client-webui.volumeClaim" . }}
+{{ if .Values.expose.internalTLS.enabled }}
+        - name: tls-secret-volume
+          secret:
+            secretName: {{ .Values.expose.internalTLS.secretName }}
+{{ end }}
+

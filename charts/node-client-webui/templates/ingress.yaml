@@ -1,0 +1,86 @@
+{{- if eq .Values.expose.type "ingress" }}
+{{- $ingress := .Values.expose.ingress -}}
+{{- $tls := .Values.expose.tls -}}
+{{- if eq .Values.expose.ingress.controller "gce" }}
+  {{- $_ := set . "path_type" "ImplementationSpecific" -}}
+  {{- $_ := set . "front_path" "/*" -}}
+  {{- $_ := set . "back_path" "/backend/*" -}}
+{{- else if eq .Values.expose.ingress.controller "ncp" }}
+  {{- $_ := set . "path_type" "Prefix" -}}
+  {{- $_ := set . "front_path" "/.*" -}}
+  {{- $_ := set . "back_path" "/backend/.*" -}}
+{{- else }}
+  {{- $_ := set . "path_type" "Prefix" -}}
+  {{- $_ := set . "front_path" "/" -}}
+  {{- $_ := set . "back_path" "/backend/" -}}
+{{- end }}
+
+---
+{{- if semverCompare "<1.14-0" (include "node-client-webui.ingress.kubeVersion" .) }}
+apiVersion: extensions/v1beta1
+{{- else if semverCompare "<1.19-0" (include "node-client-webui.ingress.kubeVersion" .) }}
+apiVersion: networking.k8s.io/v1beta1
+{{- else }}
+apiVersion: networking.k8s.io/v1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ include "node-client-webui.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "node-client-webui.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml $ingress.annotations | indent 4 }}
+{{- if .Values.expose.internalTLS.enabled }}
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+{{- end }}
+{{- if eq .Values.expose.ingress.controller "ncp" }}
+    ncp/use-regex: "true"
+    {{- if $tls.enabled }}
+    ncp/http-redirect: "true"
+    {{- end }}
+{{- end }}
+spec:
+  {{- if $ingress.className }}
+  ingressClassName: {{ $ingress.className }}
+  {{- end }}
+  {{- if and $tls.enabled (eq .Values.expose.tls.certSource "secret") }}
+  tls:
+  - secretName: {{ .Values.expose.tls.secretName }}
+    {{- if $ingress.host }}
+    hosts:
+    - {{ $ingress.host }}
+    {{- end }}
+  {{- end }}
+  rules:
+  - http:
+      paths:
+{{- if semverCompare "<1.19-0" (include "node-client-webui.ingress.kubeVersion" .) }}
+      - path: {{ .front_path }}
+        backend:
+          serviceName: {{ include "node-client-webui.fullname" . }}
+          servicePort: 25080
+      - path: {{ .back_path }}
+        backend:
+          serviceName: {{ include "node-client-webui.fullname" . }}
+          servicePort: 23051
+{{- else }}
+      - path: {{ .front_path }}
+        pathType: {{ .path_type }}
+        backend:
+          service:
+            name: {{ include "node-client-webui.fullname" . }}
+            port:
+              number: 25080
+      - path: {{ .back_path }}
+        pathType: {{ .path_type }}
+        backend:
+          service:
+            name: {{ include "node-client-webui.fullname" . }}
+            port:
+              number: 23051
+{{- end }}
+    {{- if $ingress.host }}
+    host: {{ $ingress.host }}
+    {{- end }}
+{{- end }}

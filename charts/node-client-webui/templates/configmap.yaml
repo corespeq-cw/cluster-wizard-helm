@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "node-client-webui.configmapName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+data:
+  backend_url: "{{ .Values.configMap.backendUrl }}"
+  frontend_url: "{{ .Values.configMap.frontendUrl }}"

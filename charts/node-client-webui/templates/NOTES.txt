@@ -1,0 +1,2 @@
+Please wait and enjoy node-client webui
+If you have updated your configmap or your secret, you will have to restart your deployment manually.

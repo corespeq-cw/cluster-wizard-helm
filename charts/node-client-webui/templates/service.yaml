@@ -1,0 +1,79 @@
+{{- if or (eq .Values.expose.type "clusterIP") (eq .Values.expose.type "nodePort") (eq .Values.expose.type "loadBalancer") (eq .Values.expose.type "ingress") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "node-client-webui.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "node-client-webui.labels" . | nindent 4 }}
+{{- if eq .Values.expose.type "clusterIP" }}
+{{- $clusterIP := .Values.expose.clusterIP }}
+spec:
+  type: ClusterIP
+  {{- if .Values.expose.clusterIP.staticClusterIP }}
+  clusterIP: {{ .Values.expose.clusterIP.staticClusterIP }}
+  {{- end }}
+  ports:
+    - name: frontend
+      port: {{ $clusterIP.ports.frontPort }}
+      targetPort: frontend
+      protocol: TCP
+    - name: backend
+      port: {{ $clusterIP.ports.backPort }}
+      targetPort: backend
+      protocol: TCP
+{{- else if eq .Values.expose.type "ingress" }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: frontend
+      port: 25080
+      targetPort: frontend
+      protocol: TCP
+    - name: backend
+      port: 23051
+      targetPort: backend
+      protocol: TCP
+{{- else if eq .Values.expose.type "nodePort" }}
+{{- $nodePort := .Values.expose.nodePort }}
+spec:
+  type: NodePort
+  ports:
+    - name: frontend
+      port: {{ $nodePort.ports.front.port }}
+      targetPort: frontend
+      protocol: TCP
+      {{- if $nodePort.ports.front.nodePort }}
+      nodePort: {{ $nodePort.ports.front.nodePort }}
+      {{- end }}
+    - name: backend
+      port: {{ $nodePort.ports.back.port }}
+      targetPort: backend
+      protocol: TCP
+      {{- if $nodePort.ports.back.nodePort }}
+      nodePort: {{ $nodePort.ports.back.nodePort }}
+      {{- end }}
+{{- else if eq .Values.expose.type "loadBalancer" }}
+{{- $loadBalancer := .Values.expose.loadBalancer }}
+spec:
+  type: LoadBalancer
+  {{- with $loadBalancer.sourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if $loadBalancer.IP }}
+  loadBalancerIP: {{ $loadBalancer.IP }}
+  {{- end }}
+  ports:
+    - name: frontend
+      port: {{ $loadBalancer.ports.frontPort }}
+      targetPort: frontend
+      protocol: TCP
+    - name: backend
+      port: {{ $loadBalancer.ports.backPort }}
+      targetPort: backend
+      protocol: TCP
+{{- end }}
+  selector:
+    {{- include "node-client-webui.selectorLabels" . | nindent 4 }}
+{{- end }}
