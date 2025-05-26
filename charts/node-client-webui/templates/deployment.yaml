@@ -60,7 +60,7 @@ spec:
             - name: DB_PATH
               value: {{ .Values.dbPath | default "/var/lib/.node-client" }}/node-client.db 
           volumeMounts:
-            - mountPath: {{ .Values.dbPath | default "/var/lib/.node-client" }
+            - mountPath: {{ .Values.dbPath | default "/var/lib/.node-client" }}
               name: {{ include "node-client-webui.volumeClaim" . }}
 {{ if .Values.expose.internalTLS.enabled }}          
             - name: tls-secret-volume
