@@ -33,11 +33,15 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "node-client-webui.labels" . | nindent 4 }}
+{{- if or .Values.expose.ingress.tls.clusterIssuer $ingress.annotations }}
   annotations:
 {{- if .Values.expose.ingress.tls.clusterIssuer }}
     cert-manager.io/cluster-issuer: "{{ .Values.expose.ingress.tls.clusterIssuer }}"
 {{- end }}
+{{- if $ingress.annotations }}
 {{ toYaml $ingress.annotations | indent 4 }}
+{{- end }}
+{{- end }}
 {{- if .Values.expose.internalTLS.enabled }}
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 {{- end }}
