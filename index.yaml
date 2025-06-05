@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  node-client-webui:
+  - apiVersion: v2
+    appVersion: 0.3.2
+    created: "2025-06-05T22:06:12.973456423Z"
+    description: Node client web User Interface for interracting with node wizards.
+      Created By CORESPEQ Inc.
+    digest: 1b0babb7c45b4eef1a73bba8ca854bd159d4e11ef7c9fde8768ef4f39d105456
+    name: node-client-webui
+    type: application
+    urls:
+    - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/node-client-webui-0.1.0/node-client-webui-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-06-05T22:06:12.973466051Z"
