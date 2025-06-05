@@ -1,8 +1,6 @@
 # Default values for node-client-webui.
 # This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-replicaCount: 1
+# Declare variables to be passed into your templates.rep
 
 image:
   repository: clusterwizard/node-client-webui
@@ -15,9 +13,9 @@ fullnameOverride: ""
 
 configMap:
   # External IP where backend will be available
-  backendUrl: "node-client-webui.corespeq.com/backend"
+  backendUrl: "node-client-webui.example.com/backend"
   # External IP where frontend will be available
-  frontendUrl: "node-client-webui.corespeq.com"
+  frontendUrl: "node-client-webui.example.com"
 
 # Path of the db inside pod
 dbPath: "/var/lib/.node-client"
@@ -35,12 +33,12 @@ secret:
   password: "password"
 
 expose:
-  # Set how to expose the service. Set the type as "ingress", "clusterIP", "nodePort" or "loadBalancer"
+  # Set how to expose the service. Set the type as "ingress", "clusterIP", "nodePort", "loadBalancer" or ""
   # and fill the information in the corresponding section
   type: clusterIP
   tlsOverProxy:
     # Enable TLS over a proxy or not.
-    enabled: true
+    enabled: false
   internalTLS:
     # Enable TLS or not at node-client-webui level
     enabled: false
@@ -48,25 +46,27 @@ expose:
     # "tls.crt" - the certificate
     # "tls.key" - the private key
     secretName: ""
-    # Path where the secret will be mounted inside pod
-    tlsPath: ""
-  tls:
-    # Enable TLS or not at ingress level.
-    # Delete the "ssl-redirect" annotations in "expose.ingress.annotations" when TLS is disabled and "expose.type" is "ingress"
-    enabled: false
-    # The source of the tls certificate. Set as "secret"
-    # or "none" and fill the information in the corresponding section
-    # 1) secret: read the tls certificate from the specified secret.
-    # The tls certificate can be generated manually or by cert manager
-    # 2) none: configure no tls certificate for the ingress. If the default
-    # tls certificate is configured in the ingress controller, choose this option
-    certSource: none
-    # The name of secret which contains keys named:
-    # "tls.crt" - the certificate
-    # "tls.key" - the private key
-    secretName: ""
   ingress:
-    host: node-client-webui.corespeq.com
+    tls:
+      # Enable TLS or not at ingress level.
+      # Delete the "ssl-redirect" annotations in "expose.ingress.annotations" when TLS is disabled and "expose.type" is "ingress"
+      enabled: false
+      # The source of the tls certificate. Set as "secret"
+      # or "none" and fill the information in the corresponding section
+      # 1) secret: read the tls certificate from the specified secret.
+      # The tls certificate can be generated manually or by cert manager
+      # 2) none: configure no tls certificate for the ingress. If the default
+      # tls certificate is configured in the ingress controller, choose this option
+      certSource: none
+      # The name of secret which contains keys named:
+      # "tls.crt" - the certificate
+      # "tls.key" - the private key
+      secretName: ""
+      # The name of the cluster-issuer to use
+      # This will add cert-manager.io/cluster-issuer annotation automatically to ingress
+      # Only works with cert-manager
+      clusterIssuer: ""
+    host: node-client-webui.example.com
     # set to the type of ingress controller if it has specific requirements.
     # leave as `default` for most ingress controllers.
     # set to `gce` if using the GCE ingress controller

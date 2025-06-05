@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "node-client-webui.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -40,7 +40,7 @@ spec:
                   name: {{ include "node-client-webui.configmapName" . }}
                   key: frontend_url
             - name: TLS_OVER_PROXY
-              value: {{ if or .Values.expose.tls.enabled .Values.expose.tlsOverProxy.enabled }}"true"{{ else }}"false"{{ end }}
+              value: {{ if or .Values.expose.ingress.tls.enabled .Values.expose.tlsOverProxy.enabled }}"true"{{ else }}"false"{{ end }}
             - name: TLS
               value: {{ if .Values.expose.internalTLS.enabled }}"true"{{ else }}"false"{{ end }}
             - name: CERT_PATH
@@ -64,7 +64,7 @@ spec:
               name: {{ include "node-client-webui.volumeClaim" . }}
 {{ if .Values.expose.internalTLS.enabled }}          
             - name: tls-secret-volume
-              mountPath: {{ .Values.expose.internalTLS.tlsPath}}
+              mountPath: "/etc/ssl/node-client-webui"
               readOnly: true
 {{ end }}
       volumes:
@@ -76,4 +76,3 @@ spec:
           secret:
             secretName: {{ .Values.expose.internalTLS.secretName }}
 {{ end }}
-
