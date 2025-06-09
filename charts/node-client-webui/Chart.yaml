@@ -1,6 +1,6 @@
 apiVersion: v2
 name: node-client-webui
-description: Node client web User Interface for interracting with node wizards. Created By CORESPEQ Inc.
+description: Node client web User Interface for interacting with node wizards. Created By CORESPEQ Inc.
 
 # A chart can be either an 'application' or a 'library' chart.
 #

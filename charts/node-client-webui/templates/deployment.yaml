@@ -44,9 +44,9 @@ spec:
             - name: TLS
               value: {{ if .Values.expose.internalTLS.enabled }}"true"{{ else }}"false"{{ end }}
             - name: CERT_PATH
-              value: {{ if .Values.expose.internalTLS.enabled }}{{ .Values.expose.internalTLS.tlsPath }}/tls.crt{{ else }}""{{ end }}
+              value: {{ if .Values.expose.internalTLS.enabled }}/etc/ssl/node-client-webui/tls.crt{{ else }}""{{ end }}
             - name: KEY_PATH
-              value: {{ if .Values.expose.internalTLS.enabled }}{{ .Values.expose.internalTLS.tlsPath }}/tls.key{{ else }}""{{ end }}
+              value: {{ if .Values.expose.internalTLS.enabled }}/etc/ssl/node-client-webui/tls.key{{ else }}""{{ end }}
             - name: USERNAME
               valueFrom:
                 secretKeyRef:
