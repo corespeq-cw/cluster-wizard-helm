@@ -64,6 +64,12 @@ Create the name of the configmap to use
 {{ .Release.Name }}-configmap
 {{- end }}
 
+{{/*
+Create the name of the service to use
+*/}}
+{{- define "node-client-webui.service" -}}
+{{ .Release.Name }}-service
+{{- end }}
 
 {{/*
 Create the name of the pvc to use
