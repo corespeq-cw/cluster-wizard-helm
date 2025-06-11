@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ include "node-client-webui.volumeClaim" . }}
   namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "node-client-webui.labels" . | nindent 4 }}
 spec:
   accessModes:
     - {{ .Values.pvc.accessMode | default "ReadWriteOnce" }}
