@@ -102,7 +102,7 @@ expose:
         port: 25080
         # The node port to listen on when serving front
         nodePort: 30002
-      https:
+      back:
         # The service port to listen on when serving back
         port: 23051
         # The node port to listen on when serving back
