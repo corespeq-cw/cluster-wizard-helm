@@ -11,6 +11,6 @@ spec:
   resources:
     requests:
       storage: {{ .Values.pvc.size | default "2Gi" }}
-  {{- if .Values.pvc.storageClass }}
+  {{ if .Values.pvc.storageClass }}
   storageClassName: {{ .Values.pvc.storageClass }}
-  {{- end }}
+  {{ end }}

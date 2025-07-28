@@ -10,8 +10,8 @@ metadata:
 {{- $clusterIP := .Values.expose.clusterIP }}
 spec:
   type: ClusterIP
-  {{- if .Values.expose.clusterIP.staticClusterIP }}
-  clusterIP: {{ .Values.expose.clusterIP.staticClusterIP }}
+  {{- if $clusterIP.staticClusterIP }}
+  clusterIP: {{ $clusterIP.staticClusterIP }}
   {{- end }}
   ports:
     - name: frontend

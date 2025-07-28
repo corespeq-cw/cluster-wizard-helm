@@ -17,8 +17,8 @@ configMap:
   # External IP where frontend will be available
   frontendUrl: "node-client-webui.example.com"
 
-# Path of the db inside pod
-dbPath: "/var/lib/.node-client"
+# Migrate information from db to filesystem (if your previous version was chart v0.1.0 you can put it to true for your first deployment and change it to false then)
+dbMigration: "false"
 
 # Settings for persisting data of the webui
 pvc:
