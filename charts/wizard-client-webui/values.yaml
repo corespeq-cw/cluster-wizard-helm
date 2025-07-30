@@ -1,0 +1,114 @@
+# Default values for wizard-client-webui.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.rep
+
+image:
+  repository: clusterwizard/wizard-client-webui
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+configMap:
+  # External IP where backend will be available
+  backendUrl: "wizard-client-webui.example.com/backend"
+  # External IP where frontend will be available
+  frontendUrl: "wizard-client-webui.example.com"
+
+  # &clusterWizardHost This is used to declare a global variable and to reuse it later
+  clusterWizardHost: &clusterWizardHost "cluster-wizard"
+  clusterWizardPort: "50001"
+
+etcHost:
+  addClusterWizard: false
+  clusterWizardIP: ""
+  clusterWizardHost: *clusterWizardHost
+
+clusterWizardCASecretName: "" # Secret containing server CA certificate with key ca.crt
+
+expose:
+  # Set how to expose the service. Set the type as "ingress", "clusterIP", "nodePort", "loadBalancer" or ""
+  # and fill the information in the corresponding section
+  type: clusterIP
+  tlsOverProxy:
+    # Enable TLS over a proxy or not.
+    enabled: false
+  internalTLS:
+    # Enable TLS or not at wizard-client-webui level
+    enabled: false
+    # The name of secret which contains keys named:
+    # "tls.crt" - the certificate
+    # "tls.key" - the private key
+    secretName: ""
+  ingress:
+    tls:
+      # Enable TLS or not at ingress level.
+      # Delete the "ssl-redirect" annotations in "expose.ingress.annotations" when TLS is disabled and "expose.type" is "ingress"
+      enabled: false
+      # The source of the tls certificate. Set as "secret"
+      # or "none" and fill the information in the corresponding section
+      # 1) secret: read the tls certificate from the specified secret.
+      # The tls certificate can be generated manually or by cert manager
+      # 2) none: configure no tls certificate for the ingress. If the default
+      # tls certificate is configured in the ingress controller, choose this option
+      certSource: none
+      # The name of secret which contains keys named:
+      # "tls.crt" - the certificate
+      # "tls.key" - the private key
+      secretName: ""
+      # The name of the cluster-issuer to use
+      # This will add cert-manager.io/cluster-issuer annotation automatically to ingress
+      # Only works with cert-manager
+      clusterIssuer: ""
+    host: wizard-client-webui.example.com
+    # set to the type of ingress controller if it has specific requirements.
+    # leave as `default` for most ingress controllers.
+    # set to `gce` if using the GCE ingress controller
+    # set to `ncp` if using the NCP (NSX-T Container Plugin) ingress controller
+    # set to `alb` if using the ALB ingress controller
+    # set to `f5-bigip` if using the F5 BIG-IP ingress controller
+    controller: default
+    ## Allow .Capabilities.KubeVersion.Version to be overridden while creating ingress
+    kubeVersionOverride: ""
+    className: ""
+    annotations:
+      # note different ingress controllers may require a different annotation
+      # for example, for HAProxy, use ingress.kubernetes.io/force-ssl-redirect: "true" and remove the nginx lines below
+      # rewriting the path is essential, otherwise the backend won't be found (because /backend doesn't exist).
+      ingress.kubernetes.io/ssl-redirect: "true"
+      ingress.kubernetes.io/proxy-body-size: "0"
+      haproxy.org/path-rewrite: /backend/(.*) /\1
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/rewrite-target: /
+  clusterIP:
+    # The ip address of the ClusterIP service (leave empty for acquiring dynamic ip)
+    staticClusterIP: ""
+    ports:
+      # The service port to listen on when serving front
+      frontPort: 25080
+      # The service port listen on when serving back
+      backPort: 23051
+  nodePort:
+    ports:
+      front:
+        # The service port to listen on when serving front
+        port: 25080
+        # The node port to listen on when serving front
+        nodePort: 30002
+      back:
+        # The service port to listen on when serving back
+        port: 23051
+        # The node port to listen on when serving back
+        nodePort: 30003
+  loadBalancer:
+    # Set the IP if the LoadBalancer supports assigning IP
+    IP: ""
+    ports:
+      # The service port to listen on when serving front
+      frontPort: 25080
+      # The service port listen on when serving back
+      backPort: 23051
+    sourceRanges: []

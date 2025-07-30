@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wizard-client-webui.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "wizard-client-webui.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "wizard-client-webui.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "wizard-client-webui.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 1001
+{{ if .Values.etcHost.addClusterWizard }}
+      hostAliases:
+        - ip: "{{ .Values.etcHost.clusterWizardIP }}"
+          hostnames:
+            - "{{ .Values.etcHost.clusterWizardHost }}"
+{{ end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: backend
+              containerPort: 23051
+            - name: frontend
+              containerPort: 25080
+          env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "wizard-client-webui.configmapName" . }}
+                  key: backend_url
+            - name: FRONTEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "wizard-client-webui.configmapName" . }}
+                  key: frontend_url
+            - name: CLUSTER_WIZARD_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "wizard-client-webui.configmapName" . }}
+                  key: cluster_wizard_host
+            - name: CLUSTER_WIZARD_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "wizard-client-webui.configmapName" . }}
+                  key: cluster_wizard_port
+{{ if .Values.clusterWizardCASecretName }}
+            - name: CA_CERT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.clusterWizardCASecretName }}
+                  key: ca.crt
+{{ end }}
+            - name: TLS_OVER_PROXY
+              value: {{ if or .Values.expose.ingress.tls.enabled .Values.expose.tlsOverProxy.enabled }}"true"{{ else }}"false"{{ end }}
+            - name: TLS
+              value: {{ if .Values.expose.internalTLS.enabled }}"true"{{ else }}"false"{{ end }}
+            - name: CERT_PATH
+              value: {{ if .Values.expose.internalTLS.enabled }}/etc/ssl/wizard-client-webui/tls.crt{{ else }}""{{ end }}
+            - name: KEY_PATH
+              value: {{ if .Values.expose.internalTLS.enabled }}/etc/ssl/wizard-client-webui/tls.key{{ else }}""{{ end }}
+{{ if .Values.expose.internalTLS.enabled }}
+          volumeMounts:
+            - name: tls-secret-volume
+              mountPath: "/etc/ssl/wizard-client-webui"
+              readOnly: true
+{{ end }}
+{{ if .Values.expose.internalTLS.enabled }}
+      volumes:
+        - name: tls-secret-volume
+          secret:
+            secretName: {{ .Values.expose.internalTLS.secretName }}
+{{ end }}
