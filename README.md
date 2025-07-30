@@ -1,6 +1,6 @@
 # Helm Charts for Cluster Wizard Project
 
-The Cluster Wizard Project homepage is https://www.cluster-wizard.com.
+The Cluster Wizard Project homepage is [https://www.cluster-wizard.com](https://www.cluster-wizard.com).
 
 Installers for the following software can be downloaded at https://cluster-wizard.gitlab.io/release/.
 - Node Wizard
