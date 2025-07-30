@@ -1,0 +1,2 @@
+Please wait and enjoy cluster-wizard
+If you have updated your configmap, you will have to restart your deployment manually.

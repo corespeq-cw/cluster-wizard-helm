@@ -1,0 +1,120 @@
+# Default values for cluster-wizard.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.rep
+
+image:
+  repository: clusterwizard/cluster-wizard
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+ceph:
+  enabled: false
+  secretName: "" # secret containing ceph.conf and keyring -> conf and keyring are the required key
+  pool: ""
+  user: ""
+
+licenseSecretName: "" # secret name containing cluster-wizard -> license is the required key
+
+clusterWizardCert:
+  clientCASecretName: "" # secret name containing client CA certificate and private key -> tls secret format
+  serverSecretName: "" # secret name containing server certificate and private key -> tls secret format
+
+opa:
+  policy: ""
+  role: ""
+
+
+# admin username and email of cluster-wizard admin. 
+# These information will be used during the first deployment to insert admin user in database.
+# These information are also used to create the admin certificate if the admin-cred secret doesn't exist
+# You can omit these information if you're re-deploying and admin-cred is already present
+adminUser: "" 
+adminEmail: "" 
+
+
+postgres:
+  ssl: false
+  install:
+    install: false
+    pullPolicy: "IfNotPresent"
+    pvc:
+      accessMode: "ReadWriteOnce"
+      size: "5Gi"
+      storageClass: ""
+    # Set how to expose the service. Set the type as "clusterIP", "nodePort", "loadBalancer" or ""
+    expose:
+      type: clusterIP
+      clusterIP:
+        # The ip address of the ClusterIP service (leave empty for acquiring dynamic ip)
+        staticClusterIP: ""
+      nodePort:
+        ports:
+          externalPort:
+            # The node port to listen on
+            nodePort: 30002
+      loadBalancer:
+        # Set the IP if the LoadBalancer supports assigning IP
+        IP: ""
+        sourceRanges: [ ]
+
+  tag: "17.5"
+
+  populateDB: true
+
+  password: ""  # password of postgres user
+
+  cwUser: "wizard_clients" # name of user used for managing DB
+  cwPassword: "" # password of cwUser
+  cwDBName: "cluster_management" # name of the DB to manage
+
+  # Port need to be postgres standard port (5432)
+  # Host is only the IP to use (not the port)
+  host: "postgres-service"
+
+
+
+expose:
+  # Set how to expose the service. Set the type as "ingress", "clusterIP", "nodePort", "loadBalancer" or ""
+  # and fill the information in the corresponding section
+  type: clusterIP
+  ingress:
+    host: cluster-wizard
+    # set to the type of ingress controller if it has specific requirements.
+    # leave as `default` for most ingress controllers.
+    # set to `gce` if using the GCE ingress controller
+    # set to `ncp` if using the NCP (NSX-T Container Plugin) ingress controller
+    # set to `alb` if using the ALB ingress controller
+    # set to `f5-bigip` if using the F5 BIG-IP ingress controller
+    controller: default
+    ## Allow .Capabilities.KubeVersion.Version to be overridden while creating ingress
+    kubeVersionOverride: ""
+    className: ""
+    annotations:
+      haproxy.org/ssl-passthrough: "true"
+      nginx.ingress.kubernetes.io/secure-backends: "true"
+      nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+
+  clusterIP:
+    # The ip address of the ClusterIP service (leave empty for acquiring dynamic ip)
+    staticClusterIP: ""
+    ports:
+      # The service port to listen on
+      externalPort: 50001
+  nodePort:
+    ports:
+      externalPort:
+        # The service port to listen on
+        port: 50001
+        # The node port to listen on
+        nodePort: 30002
+  loadBalancer:
+    # Set the IP if the LoadBalancer supports assigning IP
+    IP: ""
+    ports:
+      # The service port to listen on
+      externalPort: 50001
+    sourceRanges: []

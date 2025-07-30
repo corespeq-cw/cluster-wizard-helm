@@ -1,0 +1,18 @@
+{{- if .Values.postgres.install.install }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cluster-wizard.DB.volumeClaim" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "cluster-wizard.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.postgres.install.pvc.accessMode | default "ReadWriteOnce" }}
+  resources:
+    requests:
+      storage: {{ .Values.postgres.install.pvc.size | default "5Gi" }}
+{{ if .Values.postgres.install.pvc.storageClass }}
+  storageClassName: {{ .Values.postgres.install.pvc.storageClass }}
+{{ end }}
+{{- end }}

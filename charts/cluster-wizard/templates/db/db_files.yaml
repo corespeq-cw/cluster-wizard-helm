@@ -1,0 +1,20 @@
+{{- if .Values.postgres.populateDB }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-populate-script
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded
+  labels:
+    {{- include "cluster-wizard.labels" . | nindent 4 }}
+data:
+  init.sql: |
+{{ tpl ($.Files.Get "files/sql/0.0.0-db-setup.sql") $ | indent 4 }}
+  populate.sql: | {{ range $path, $_ :=  .Files.Glob  "**.sql" }}
+{{ if ne $path "files/sql/0.0.0-db-setup.sql" }}
+{{ tpl ($.Files.Get $path) $ | indent 4 }}
+{{ end }}
+{{ end }}
+{{- end }}

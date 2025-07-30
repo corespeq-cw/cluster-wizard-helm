@@ -1,0 +1,62 @@
+{{- if or (eq .Values.expose.type "clusterIP") (eq .Values.expose.type "nodePort") (eq .Values.expose.type "loadBalancer") (eq .Values.expose.type "ingress") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cluster-wizard.service" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "cluster-wizard.labels" . | nindent 4 }}
+{{- if eq .Values.expose.type "clusterIP" }}
+{{- $clusterIP := .Values.expose.clusterIP }}
+spec:
+  type: ClusterIP
+  {{- if $clusterIP.staticClusterIP }}
+  clusterIP: {{ $clusterIP.staticClusterIP }}
+  {{- end }}
+  ports:
+    - name: cw-port
+      port: {{ $clusterIP.ports.externalPort }}
+      targetPort: cw-port
+      protocol: TCP
+{{- else if eq .Values.expose.type "ingress" }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: cw-port
+      port: 50001
+      targetPort: cw-port
+      protocol: TCP
+{{- else if eq .Values.expose.type "nodePort" }}
+{{- $nodePort := .Values.expose.nodePort }}
+spec:
+  type: NodePort
+  ports:
+    - name: cw-port
+      port: {{ $nodePort.ports.externalPort.port }}
+      targetPort: cw-port
+      protocol: TCP
+      {{- if $nodePort.ports.externalPort.nodePort }}
+      nodePort: {{ $nodePort.ports.externalPort.nodePort }}
+      {{- end }}
+{{- else if eq .Values.expose.type "loadBalancer" }}
+{{- $loadBalancer := .Values.expose.loadBalancer }}
+spec:
+  type: LoadBalancer
+  {{- with $loadBalancer.sourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if $loadBalancer.IP }}
+  loadBalancerIP: {{ $loadBalancer.IP }}
+  {{- end }}
+  ports:
+    - name: cw-port
+      port: {{ $loadBalancer.ports.externalPort }}
+      targetPort: cw-port
+      protocol: TCP
+{{- end }}
+  selector:
+    {{- include "cluster-wizard.selectorLabels" . | nindent 4 }}
+{{- else if not (eq .Values.expose.type "") }}
+{{ fail "Invalid expose type provided: Allowed values are \"ingress\", \"clusterIP\", \"nodePort\", \"loadBalancer\" or \"\"" }}
+{{- end }}

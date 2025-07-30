@@ -1,0 +1,22 @@
+{{- if .Values.postgres.install.install }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cluster-wizard.DB.configmap" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ include "cluster-wizard.DB" . }}
+    {{- include "cluster-wizard.labels" . | nindent 4 }}
+data:
+{{- if not .Values.postgres.password }}
+{{- fail "ERROR: PostgreSQL password must be set!" }}
+{{- end }}
+  POSTGRES_PASSWORD: {{ .Values.postgres.password }}
+
+  PSQL_HOST: {{ .Values.postgres.host }}
+  PSQL_PORT: "5432"
+  PSQL_USER: "cluster_backup"
+  PSQL_DB: {{ .Values.postgres.cwDBName }}
+
+  DAYS_TO_KEEP: "60"
+{{- end }}

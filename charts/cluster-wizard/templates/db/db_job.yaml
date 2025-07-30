@@ -1,0 +1,53 @@
+{{- if .Values.postgres.populateDB }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-populator
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded
+  labels:
+    {{- include "cluster-wizard.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: db-populator
+          image: "postgres:{{ .Values.postgres.tag }}"
+          command:
+            - "sh"
+            - "-c"
+            - |
+              max_attempts=12
+              attempt=1
+              echo "Waiting for database to be ready..."
+              
+              while [ $attempt -le $max_attempts ]; do
+                if PGPASSWORD="{{ .Values.postgres.password }}" pg_isready -h {{ .Values.postgres.host }} -U postgres; then
+                  echo "Database is ready. Running SQL script..."
+                  PGPASSWORD="{{ .Values.postgres.password }}" psql -h {{ .Values.postgres.host }} -U postgres -f /sql/init.sql
+                  if [ $? -ne 0 ]; then
+                    exit 1
+                  fi
+                  PGPASSWORD="{{ .Values.postgres.cwPassword }}" psql -h {{ .Values.postgres.host }} -U {{ .Values.postgres.cwUser }} -d {{ .Values.postgres.cwDBName }} -f /sql/populate.sql
+                  exit $?
+                else
+                  echo "Attempt $attempt/$max_attempts: Database not ready. Retrying in 5 seconds..."
+                  sleep 5
+                  attempt=$((attempt+1))
+                fi
+              done
+              
+              echo "Database did not become ready after $max_attempts attempts. Exiting..."
+              exit 1
+          volumeMounts:
+            - name: sql-script-volume
+              mountPath: /sql
+      volumes:
+        - name: sql-script-volume
+          configMap:
+            name: postgres-populate-script
+  {{- end }}

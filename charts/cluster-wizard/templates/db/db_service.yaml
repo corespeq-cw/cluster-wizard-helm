@@ -1,0 +1,57 @@
+{{- if .Values.postgres.install.install }}
+{{- if or (eq .Values.postgres.install.expose.type "clusterIP") (eq .Values.postgres.install.expose.type "nodePort") (eq .Values.postgres.install.expose.type "loadBalancer") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ include "cluster-wizard.DB" . }}
+    {{- include "cluster-wizard.labels" . | nindent 4 }}
+{{- if eq .Values.postgres.install.expose.type "clusterIP" }}
+{{- $clusterIP := .Values.postgres.install.expose.clusterIP }}
+spec:
+  type: ClusterIP
+  {{- if $clusterIP.staticClusterIP }}
+  clusterIP: {{ $clusterIP.staticClusterIP }}
+  {{- end }}
+  ports:
+    - name: access
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+{{- else if eq .Values.postgres.install.expose.type "nodePort" }}
+{{- $nodePort := .Values.postgres.install.expose.nodePort }}
+spec:
+  type: NodePort
+  ports:
+    - name: access
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+      {{- if $nodePort.ports.externalPort.nodePort }}
+      nodePort: {{ $nodePort.ports.externalPort.nodePort }}
+      {{- end }}
+{{- else if eq .Values.postgres.install.expose.type "loadBalancer" }}
+{{- $loadBalancer := .Values.postgres.install.expose.loadBalancer }}
+spec:
+  type: LoadBalancer
+  {{- with $loadBalancer.sourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if $loadBalancer.IP }}
+  loadBalancerIP: {{ $loadBalancer.IP }}
+  {{- end }}
+  ports:
+    - name: access
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+{{- end }}
+  selector:
+    app: {{ include "cluster-wizard.DB" . }}
+{{- else if not (eq .Values.postgres.install.expose.type "") }}
+{{ fail "Invalid expose type for postgres service provided: Allowed values are \"clusterIP\", \"nodePort\", \"loadBalancer\" or \"\"" }}
+{{- end }}
+{{- end }}

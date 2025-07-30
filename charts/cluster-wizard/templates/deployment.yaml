@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cluster-wizard.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "cluster-wizard.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "cluster-wizard.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "cluster-wizard.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 50001
+              name: cw-port
+          volumeMounts:
+            - name: secret-volume
+              readOnly: true
+              mountPath: "/cluster_wizard"
+      volumes:
+        - name: secret-volume
+          projected:
+            sources:
+            - secret:
+                name: {{ include "cluster-wizard.secret" . }}
+{{ if .Values.ceph.enabled }}                
+            - secret:
+                name: {{ .Values.ceph.secretName }}
+                items:
+                  - key: conf
+                    path: ceph.conf
+                  - key: keyring
+                    path: libvirt.keyring
+{{ end }}
+            - secret:
+                name: {{ .Values.clusterWizardCert.clientCASecretName }}
+                items:
+                  - key: tls.crt
+                    path: client_ca_cert.pem
+                  - key: tls.key
+                    path: client_ca_key.pem
+            - secret:
+                name: {{ .Values.clusterWizardCert.serverSecretName }}
+                items:
+                  - key: tls.crt
+                    path: server_cert.pem
+                  - key: tls.key
+                    path: server_key.pem
+            - secret:
+                name: {{ .Values.licenseSecretName }}
+                items:
+                  - key: license
+                    path: cluster-wizard.lic
