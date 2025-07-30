@@ -1,5 +1,17 @@
 apiVersion: v1
 entries:
+  cluster-wizard:
+  - apiVersion: v2
+    appVersion: 0.4.0-beta
+    created: "2025-07-30T18:17:57.130098249Z"
+    description: Cluster Wizard for interacting with node wizards. Created By CORESPEQ
+      Inc.
+    digest: 234a46a93694b33909ffe93848de2c8c2ab66b95250fcc2e9f1b0a29c9a2763a
+    name: cluster-wizard
+    type: application
+    urls:
+    - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/cluster-wizard-0.1.0/cluster-wizard-0.1.0.tgz
+    version: 0.1.0
   node-client-webui:
   - apiVersion: v2
     appVersion: 0.4.0-beta
@@ -23,4 +35,4 @@ entries:
     urls:
     - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/node-client-webui-0.1.0/node-client-webui-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-28T22:27:33.661351669Z"
+generated: "2025-07-30T18:17:57.130106485Z"
