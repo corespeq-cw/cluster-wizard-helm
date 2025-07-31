@@ -35,4 +35,16 @@ entries:
     urls:
     - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/node-client-webui-0.1.0/node-client-webui-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-30T18:52:02.263886378Z"
+  wizard-client-webui:
+  - apiVersion: v2
+    appVersion: 0.4.0-beta
+    created: "2025-07-31T02:23:23.051138753Z"
+    description: Wizard client web User Interface for interacting with cluster wizard.
+      Created By CORESPEQ Inc.
+    digest: 379b79d49c093bb30d9060efa68e6b12d7e1244daa219bc12eeb95ba87bf53e2
+    name: wizard-client-webui
+    type: application
+    urls:
+    - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/wizard-client-webui-0.1.0/wizard-client-webui-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-07-31T02:23:23.051148141Z"
