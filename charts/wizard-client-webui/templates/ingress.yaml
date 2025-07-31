@@ -36,7 +36,7 @@ metadata:
   annotations:
 {{ toYaml $ingress.annotations | indent 4 }}
 {{- if .Values.expose.ingress.tls.clusterIssuer }}
-cert-manager.io/cluster-issuer: "{{ .Values.expose.ingress.tls.clusterIssuer }}"
+    cert-manager.io/cluster-issuer: "{{ .Values.expose.ingress.tls.clusterIssuer }}"
 {{- end }}
 {{- if .Values.expose.internalTLS.enabled }}
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
