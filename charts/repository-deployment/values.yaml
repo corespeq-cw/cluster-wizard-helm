@@ -14,16 +14,16 @@ nginx:
   port: 80
   pullPolicy: IfNotPresent
   serviceType: LoadBalancer
-  loadBalancerIP: 10.8.4.239
+  loadBalancerIP: ""
 
 isoStorage:
   accessMode: "ReadWriteOnce"
-  className: ""
+  storageClass: ""
   size: "15Gi"
 
 repoStorage:
   accessMode: "ReadWriteOnce"
-  className: ""
+  storageClass: ""
   size: "15Gi"
 
 configMapData: |
