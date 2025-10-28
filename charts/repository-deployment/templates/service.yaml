@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-service
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "iso-repo-server.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "iso-repo-server.selectorLabels" . | nindent 4 }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.nginx.port }}
+      targetPort: {{ .Values.nginx.port }}
+  type: {{ .Values.nginx.serviceType }}
+  {{- if .Values.nginx.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.nginx.loadBalancerIP }}
+  {{- end }}

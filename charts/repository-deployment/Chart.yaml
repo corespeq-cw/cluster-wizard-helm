@@ -1,0 +1,7 @@
+apiVersion: v2
+name: iso-repo-server
+description: A Helm chart to deploy an NGINX web server with a Flask Backend, to host ISO Images and Ubuntu Repositories
+type: application
+version: 0.1.0
+appVersion: "1.0.7"
+

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-iso-mapping-config
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "iso-repo-server.labels" . | nindent 4 }}
+data:
+  mapping.json: {{ .Values.configMapData | quote }}

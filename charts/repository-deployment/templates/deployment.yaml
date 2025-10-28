@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "iso-repo-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "iso-repo-server.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "iso-repo-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "iso-repo-server.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: flask
+        image: "{{ .Values.flask.image }}:{{ .Values.flask.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.flask.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.flask.port }}
+        volumeMounts:
+        - name: shared-repo-storage
+          mountPath: /mnt/ubuntu-repo
+        - name: shared-iso-storage
+          mountPath: /mnt/iso-storage
+        - name: config-volume
+          mountPath: /app/config/mapping.json
+          subPath: mapping.json
+        env:
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-auth-secret
+              key: token
+      - name: nginx
+        image: "{{ .Values.nginx.image }}:{{ .Values.nginx.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.nginx.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.nginx.port }}
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: nginx.conf
+        - name: shared-repo-storage
+          mountPath: /mnt/ubuntu-repo
+          readOnly: true
+        - name: shared-iso-storage
+          mountPath: /mnt/iso-storage
+          readOnly: true
+      volumes:
+      - name: shared-repo-storage
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-repo-storage
+      - name: shared-iso-storage
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-iso-storage
+      - name: nginx-config
+        configMap:
+          name: {{ .Release.Name }}-nginx-config
+      - name: config-volume
+        configMap:
+          name: {{ .Release.Name }}-iso-mapping-config
+

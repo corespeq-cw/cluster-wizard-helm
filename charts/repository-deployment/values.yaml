@@ -1,0 +1,46 @@
+nameOverride: ""
+fullnameOverride: ""
+
+auth:
+  token: "corespeq"
+
+flask:
+  image: clusterwizard/flask-backend-server
+  port: 5000
+  pullPolicy: IfNotPresent
+
+nginx:
+  image: clusterwizard/nginx-frontend-server
+  port: 80
+  pullPolicy: IfNotPresent
+  serviceType: LoadBalancer
+  loadBalancerIP: 10.8.4.239
+
+isoStorage:
+  accessMode: "ReadWriteOnce"
+  className: ""
+  size: "15Gi"
+
+repoStorage:
+  accessMode: "ReadWriteOnce"
+  className: ""
+  size: "15Gi"
+
+configMapData: |
+  {
+    "ubuntu20"  : "ubuntu-20.04.4-live-server-amd64.iso",
+    "ubuntu22"  : "ubuntu-22.04.2-live-server-amd64.iso",
+    "ubuntu24"  : "ubuntu-24.04.1-live-server-amd64.iso",
+    "win2k19"   : "Windows_Server2019.iso",
+    "win2k25"   : "Windows_Server2025.iso",
+    "virtio"    : "virtio-win.iso",
+    "rhel9.2"   : "rhel-9.2-x86_64-dvd.iso",
+    "rhel9.5"   : "rhel-9.5-x86_64-dvd.iso",
+    "rhel10.0"  : "rhel-10.0-x86_64-dvd.iso",
+    "sles15sp5" : "SLE-15-SP5-Full-x86_64-GM-Media1.iso",
+    "sles15sp6" : "SLE-15-SP6-Full-x86_64-GM-Media1.iso",
+    "sles15sp7" : "SLE-15-SP7-Full-x86_64-GM-Media1.iso",
+    "rocky9.2"  : "Rocky-9.2-x86_64-dvd.iso",
+    "rocky9.5"  : "Rocky-9.5-x86_64-dvd.iso",
+    "rocky10.0" : "Rocky-10.0-x86_64-dvd1.iso"
+  }
