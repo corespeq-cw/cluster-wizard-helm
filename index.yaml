@@ -12,6 +12,18 @@ entries:
     urls:
     - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/cluster-wizard-0.1.0/cluster-wizard-0.1.0.tgz
     version: 0.1.0
+  iso-repo-server:
+  - apiVersion: v2
+    appVersion: 1.0.7
+    created: "2025-10-28T17:56:21.251747805Z"
+    description: A Helm chart to deploy an NGINX web server with a Flask Backend,
+      to host ISO Images and Ubuntu Repositories
+    digest: 7e16069bb6b6ba4a845d2c4782163301b7cd8013d1cfd9aeaf3c2408394cf41c
+    name: iso-repo-server
+    type: application
+    urls:
+    - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/iso-repo-server-0.1.0/iso-repo-server-0.1.0.tgz
+    version: 0.1.0
   node-client-webui:
   - apiVersion: v2
     appVersion: 0.4.0-beta
@@ -24,4 +36,16 @@ entries:
     urls:
     - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/node-client-webui-0.2.0/node-client-webui-0.2.0.tgz
     version: 0.2.0
-generated: "2025-07-31T02:23:23.051148141Z"
+  wizard-client-webui:
+  - apiVersion: v2
+    appVersion: 0.4.0-beta
+    created: "2025-10-28T17:56:21.435425448Z"
+    description: Wizard client web User Interface for interacting with cluster wizard.
+      Created By CORESPEQ Inc.
+    digest: 6b0bfef501de9bacd8d053008fd92f71f63185f91f1bc583ad1c918cc5e974bf
+    name: wizard-client-webui
+    type: application
+    urls:
+    - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/wizard-client-webui-0.1.0/wizard-client-webui-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-10-28T17:56:21.435438813Z"
