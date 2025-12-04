@@ -19,6 +19,10 @@ spec:
     spec:
       securityContext:
         fsGroup: 1001
+    {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -57,8 +61,6 @@ spec:
                 secretKeyRef:
                   name: {{ include "node-client-webui.secretCredential" . }}
                   key: password
-            - name: DB_MIGRATION
-              value: "{{ .Values.dbMigration }}"
           volumeMounts:
             - mountPath: "/home/nonrootuser/.node-client"
               name: {{ include "node-client-webui.volumeClaim" . }}
