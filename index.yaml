@@ -2,6 +2,17 @@ apiVersion: v1
 entries:
   cluster-wizard:
   - apiVersion: v2
+    appVersion: 0.5.0
+    created: "2026-02-03T19:02:57.585383694Z"
+    description: Cluster Wizard for interacting with node wizards. Created By CORESPEQ
+      Inc.
+    digest: e732d9dc5f1806ce6329b3f965a387a335306edac18d9411194befa29ff5a24f
+    name: cluster-wizard
+    type: application
+    urls:
+    - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/cluster-wizard-0.2.0/cluster-wizard-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.4.0-beta
     created: "2025-07-30T18:17:57.130098249Z"
     description: Cluster Wizard for interacting with node wizards. Created By CORESPEQ
@@ -49,6 +60,17 @@ entries:
     version: 0.2.0
   wizard-client-webui:
   - apiVersion: v2
+    appVersion: 0.5.0
+    created: "2026-02-03T19:02:57.828506551Z"
+    description: Wizard client web User Interface for interacting with cluster wizard.
+      Created By CORESPEQ Inc.
+    digest: a841dc7af584a7704e065b85b796c24ec20d38fbab7392b3bcc09e296049a193
+    name: wizard-client-webui
+    type: application
+    urls:
+    - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/wizard-client-webui-0.2.0/wizard-client-webui-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.4.0-beta
     created: "2025-10-28T17:56:21.435425448Z"
     description: Wizard client web User Interface for interacting with cluster wizard.
@@ -59,4 +81,4 @@ entries:
     urls:
     - https://github.com/corespeq-cw/cluster-wizard-helm/releases/download/wizard-client-webui-0.1.0/wizard-client-webui-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-04T17:04:12.919272965Z"
+generated: "2026-02-03T19:02:57.828521739Z"
