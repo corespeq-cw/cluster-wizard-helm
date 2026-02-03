@@ -1,10 +1,20 @@
-ALTER TABLE host_info
-    ADD COLUMN  nw_license    TEXT;
+\set ON_ERROR_STOP 1
 
-ALTER TABLE role_action ADD UNIQUE(action);
+ALTER TABLE host_info ADD COLUMN IF NOT EXISTS nw_license TEXT;
 
-ALTER TABLE cluster_users
-    ADD COLUMN  email    varchar(50);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conrelid = 'role_action'::regclass
+          AND conname = 'role_action_action_key'
+    ) THEN
+    ALTER TABLE role_action ADD CONSTRAINT role_action_action_key UNIQUE (action);
+    END IF;
+END$$;
+
+ALTER TABLE cluster_users ADD COLUMN IF NOT EXISTS email varchar(50);
 
 CREATE TABLE IF NOT EXISTS  user_csr_info(
     ID           SERIAL            NOT NULL,
@@ -44,8 +54,7 @@ ON CONFLICT (role_id, action_id) DO NOTHING;
 
 ---- 7/7/2025
 
-ALTER TABLE cluster_users
-ADD COLUMN  fullname    varchar(50);
+ALTER TABLE cluster_users ADD COLUMN IF NOT EXISTS fullname varchar(50);
 
 
 DO $$
@@ -78,8 +87,7 @@ CREATE TABLE IF NOT EXISTS host_deleted(
 );
 
 ---- 7/10/2025
-ALTER TABLE host_info
-ADD COLUMN  active    VARCHAR(20);
+ALTER TABLE host_info ADD COLUMN IF NOT EXISTS active VARCHAR(20);
 
 UPDATE host_info SET active = 'active' WHERE COALESCE(active,'') = '';
 

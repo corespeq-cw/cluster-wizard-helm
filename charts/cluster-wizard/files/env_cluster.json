@@ -2,6 +2,7 @@
   "ceph_pool"   : "{{ .Values.ceph.pool }}",
   "ceph_user"   : "{{ .Values.ceph.user }}",
   "ceph_enable" : "{{ .Values.ceph.enabled }}",
+  "smtp_enable" : "{{ .Values.smtp.enabled }}",
   "psql_host"   : "{{ .Values.postgres.host }}",
   "psql_user"   : "{{ .Values.postgres.cwUser }}",
   "psql_pwd"    : "{{ .Values.postgres.cwPassword }}",

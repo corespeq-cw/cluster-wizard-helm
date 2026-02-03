@@ -1,3 +1,4 @@
+\set ON_ERROR_STOP 1
 
 DO $$
 BEGIN
@@ -104,9 +105,20 @@ ON CONFLICT (role_id, action_id) DO NOTHING;
 
 --------
 --ALTER TABLE vm_info ADD UNIQUE(name);
-ALTER TABLE host_info ADD UNIQUE(host_name);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conrelid = 'host_info'::regclass
+          AND conname = 'host_info_host_name_key'
+    ) THEN
+    ALTER TABLE host_info ADD CONSTRAINT host_info_host_name_key UNIQUE (host_name);
+END IF;
+END$$;
 
-ALTER TABLE vm_info ADD enable boolean;
+
+ALTER TABLE vm_info ADD COLUMN IF NOT EXISTS enable boolean;
 UPDATE vm_info SET enable=true WHERE enable IS NULL;
 
 DO $$

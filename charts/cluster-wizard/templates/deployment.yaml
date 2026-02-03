@@ -17,6 +17,10 @@ spec:
       labels:
         {{- include "cluster-wizard.selectorLabels" . | nindent 8 }}
     spec:
+    {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -24,6 +28,22 @@ spec:
           ports:
             - containerPort: 50001
               name: cw-port
+          livenessProbe:
+            exec:
+              command:
+              - ./cluster-wizard
+              - -check-health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 5
+          readinessProbe:
+            exec:
+              command:
+                - ./cluster-wizard
+                - -check-health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 5
           volumeMounts:
             - name: secret-volume
               readOnly: true

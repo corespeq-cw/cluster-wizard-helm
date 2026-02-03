@@ -1,0 +1,9 @@
+{
+  "smtp_host": "{{ .Values.smtp.host }}",
+  "smtp_port": "{{ .Values.smtp.port }}",
+  "smtp_user": "{{ .Values.smtp.user }}",
+  "smtp_pwd" : "{{ .Values.smtp.password }}",
+  "smtp_from_name": "{{ .Values.smtp.from_name }}",
+  "smtp_from_email": "{{ .Values.smtp.from_email }}",
+  "smtp_reply_to": "{{ .Values.smtp.reply_to }}"
+}

@@ -1,3 +1,5 @@
+\set ON_ERROR_STOP 1
+
 CREATE TABLE IF NOT EXISTS cluster_users (
     ID           int               NOT NULL,
     username     varchar(30)       NOT NULL,
@@ -63,13 +65,13 @@ CREATE TABLE IF NOT EXISTS vm_image_mapping (
     PRIMARY KEY (vm_id, image_id)
 );
 
-ALTER TABLE vm_info ADD COLUMN class varchar(50);
+ALTER TABLE vm_info ADD COLUMN IF NOT EXISTS class varchar(50);
 
-ALTER TABLE ceph_images ADD COLUMN is_deleted boolean;
-ALTER TABLE ceph_images ADD COLUMN image_type varchar(50);
+ALTER TABLE ceph_images ADD COLUMN IF NOT EXISTS is_deleted boolean;
+ALTER TABLE ceph_images ADD COLUMN IF NOT EXISTS image_type varchar(50);
 
-ALTER TABLE vm_image_mapping ADD COLUMN is_primary boolean;
-ALTER TABLE vm_image_mapping ADD COLUMN is_deleted boolean;
+ALTER TABLE vm_image_mapping ADD COLUMN IF NOT EXISTS is_primary boolean;
+ALTER TABLE vm_image_mapping ADD COLUMN IF NOT EXISTS is_deleted boolean;
 
 CREATE TABLE IF NOT EXISTS vm_snapshots (
 ID  SERIAL  NOT NULL,

@@ -7,6 +7,8 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
+# imagePullSecrets:
+#   - name: my_secret
 
 nameOverride: ""
 fullnameOverride: ""
@@ -16,6 +18,16 @@ ceph:
   secretName: "" # secret containing ceph.conf and keyring -> conf and keyring are the required key
   pool: ""
   user: ""
+
+smtp:
+  enabled: false
+  host: ""
+  port: ""
+  user: ""
+  password: ""
+  from_name: ""
+  from_email: ""
+  reply_to: ""
 
 licenseSecretName: "" # secret name containing cluster-wizard -> license is the required key
 
@@ -29,11 +41,12 @@ opa:
 
 
 # admin username and email of cluster-wizard admin. 
-# These information will be used during the first deployment to insert admin user in database.
+# These information will be used during the first deployment to insert admin user and password in database.
 # These information are also used to create the admin certificate if the admin-cred secret doesn't exist
 # You can omit these information if you're re-deploying and admin-cred is already present
 adminUser: "" 
-adminEmail: "" 
+adminEmail: ""
+adminPass: ""
 
 
 postgres:
