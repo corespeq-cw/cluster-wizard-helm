@@ -18,10 +18,6 @@ spec:
       port: {{ $clusterIP.ports.frontPort }}
       targetPort: frontend
       protocol: TCP
-    - name: backend
-      port: {{ $clusterIP.ports.backPort }}
-      targetPort: backend
-      protocol: TCP
 {{- else if eq .Values.expose.type "ingress" }}
 spec:
   type: ClusterIP
@@ -29,10 +25,6 @@ spec:
     - name: frontend
       port: 25080
       targetPort: frontend
-      protocol: TCP
-    - name: backend
-      port: 23051
-      targetPort: backend
       protocol: TCP
 {{- else if eq .Values.expose.type "nodePort" }}
 {{- $nodePort := .Values.expose.nodePort }}
@@ -45,13 +37,6 @@ spec:
       protocol: TCP
       {{- if $nodePort.ports.front.nodePort }}
       nodePort: {{ $nodePort.ports.front.nodePort }}
-      {{- end }}
-    - name: backend
-      port: {{ $nodePort.ports.back.port }}
-      targetPort: backend
-      protocol: TCP
-      {{- if $nodePort.ports.back.nodePort }}
-      nodePort: {{ $nodePort.ports.back.nodePort }}
       {{- end }}
 {{- else if eq .Values.expose.type "loadBalancer" }}
 {{- $loadBalancer := .Values.expose.loadBalancer }}
@@ -68,10 +53,6 @@ spec:
     - name: frontend
       port: {{ $loadBalancer.ports.frontPort }}
       targetPort: frontend
-      protocol: TCP
-    - name: backend
-      port: {{ $loadBalancer.ports.backPort }}
-      targetPort: backend
       protocol: TCP
 {{- end }}
   selector:

@@ -34,21 +34,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: backend
-              containerPort: 23051
             - name: frontend
               containerPort: 25080
           env:
-            - name: BACKEND_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "wizard-client-webui.configmapName" . }}
-                  key: backend_url
-            - name: FRONTEND_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "wizard-client-webui.configmapName" . }}
-                  key: frontend_url
             - name: CLUSTER_WIZARD_HOST
               valueFrom:
                 configMapKeyRef:

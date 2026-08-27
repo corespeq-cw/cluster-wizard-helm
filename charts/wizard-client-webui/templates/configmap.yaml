@@ -6,7 +6,5 @@ metadata:
   labels:
     {{- include "wizard-client-webui.labels" . | nindent 4 }}
 data:
-  backend_url: "{{ .Values.configMap.backendUrl }}"
-  frontend_url: "{{ .Values.configMap.frontendUrl }}"
   cluster_wizard_host: "{{ .Values.configMap.clusterWizardHost }}"
   cluster_wizard_port: "{{ .Values.configMap.clusterWizardPort }}"

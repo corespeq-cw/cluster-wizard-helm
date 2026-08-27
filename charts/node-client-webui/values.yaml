@@ -13,12 +13,6 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-configMap:
-  # External IP where backend will be available
-  backendUrl: "node-client-webui.example.com/backend"
-  # External IP where frontend will be available
-  frontendUrl: "node-client-webui.example.com"
-
 
 # Settings for persisting data of the webui
 pvc:
@@ -66,6 +60,7 @@ expose:
       # This will add cert-manager.io/cluster-issuer annotation automatically to ingress
       # Only works with cert-manager
       clusterIssuer: ""
+    # Where frontend will be available (do not use node-client-webui.example.com/api/... because api is reserved)
     host: node-client-webui.example.com
     # set to the type of ingress controller if it has specific requirements.
     # leave as `default` for most ingress controllers.
@@ -80,21 +75,16 @@ expose:
     annotations:
       # note different ingress controllers may require a different annotation
       # for example, for HAProxy, use ingress.kubernetes.io/force-ssl-redirect: "true" and remove the nginx lines below
-      # rewriting the path is essential, otherwise the backend won't be found (because /backend doesn't exist).
       ingress.kubernetes.io/ssl-redirect: "true"
       ingress.kubernetes.io/proxy-body-size: "0"
-      haproxy.org/path-rewrite: /backend/(.*) /\1
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      nginx.ingress.kubernetes.io/rewrite-target: /
   clusterIP:
     # The ip address of the ClusterIP service (leave empty for acquiring dynamic ip)
     staticClusterIP: ""
     ports:
       # The service port to listen on when serving front
       frontPort: 25080
-      # The service port listen on when serving back
-      backPort: 23051
   nodePort:
     ports:
       front:
@@ -102,17 +92,10 @@ expose:
         port: 25080
         # The node port to listen on when serving front
         nodePort: 30002
-      back:
-        # The service port to listen on when serving back
-        port: 23051
-        # The node port to listen on when serving back
-        nodePort: 30003
   loadBalancer:
     # Set the IP if the LoadBalancer supports assigning IP
     IP: ""
     ports:
       # The service port to listen on when serving front
       frontPort: 25080
-      # The service port listen on when serving back
-      backPort: 23051
     sourceRanges: []

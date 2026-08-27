@@ -48,6 +48,9 @@ adminUser: ""
 adminEmail: ""
 adminPass: ""
 
+log:
+  level: "info" #info(default)/debug/warn/error
+  format: "text" #text(default)/json
 
 postgres:
   ssl: false

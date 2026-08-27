@@ -25,6 +25,10 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["./cluster-wizard"]
+          args:
+            - "-log-level={{ .Values.log.level | default "info" }}"
+            - "-log-format={{ .Values.log.format | default "text" }}"
           ports:
             - containerPort: 50001
               name: cw-port
@@ -36,6 +40,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 5
+            timeoutSeconds: 5
           readinessProbe:
             exec:
               command:
@@ -44,6 +49,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 5
+            timeoutSeconds: 5
           volumeMounts:
             - name: secret-volume
               readOnly: true
